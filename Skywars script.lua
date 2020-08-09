@@ -1,0 +1,228 @@
+--anti fall-to-death script + ore highlight script + autofarm xd
+function ores(ore)
+	local bha = Instance.new("BoxHandleAdornment", ore)
+	bha.Adornee = ore
+	bha.Size = ore.Size
+	bha.ZIndex = 0
+	bha.AlwaysOnTop = true
+	bha.Transparency = 0.5
+	local coin = ore.CoinsValue.Value
+	if coin == 50 then
+	bha.Color = BrickColor.new("Lime green")
+	elseif coin == 35 then
+	bha.Color = BrickColor.new("Cyan")
+	elseif coin == 15 then
+	bha.Color = BrickColor.new("New Yeller")
+	elseif coin == 10 then
+	bha.Color = BrickColor.new("Medium stone grey")
+	elseif coin == 5 then
+	bha.Color = BrickColor.new("Really black")
+	end
+end
+local part = Instance.new("Part", workspace)
+part.Name = "AntiFallPart"
+part.Anchored = true
+part.Material = Enum.Material.SmoothPlastic
+part.Color = Color3.fromRGB(0, 143, 156)
+part.Size = Vector3.new(310, 1, 325)
+part.Position = Vector3.new(25, 145, -8)
+local antifall = true
+game.Players.LocalPlayer:GetMouse().KeyDown:connect(function(key)
+if key == "q" then
+if antifall then
+antifall = false
+part.Transparency = 1
+part.CanCollide = false
+local h = Instance.new("Hint", workspace)
+h.Text = "AntiFall turned off!"
+wait(2)
+h:Destroy()
+else
+antifall = true
+part.Transparency = 0
+part.CanCollide = true
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 20, 0)
+local h = Instance.new("Hint", workspace)
+h.Text = "AntiFall turned on!"
+wait(2)
+h:Destroy()
+end
+elseif key == "x" then
+local m
+for i, b in ipairs(workspace:GetChildren()) do
+	if b.Name:match("Map") then
+		m = b
+	end
+end
+if m then
+for i, ore in ipairs(m.Map.Ores:GetChildren()) do
+	if not ore:FindFirstChild("BoxHandleAdornment") then
+	ores(ore)
+	end
+end
+end
+if game.UserInputService:IsKeyDown(Enum.KeyCode.Z) then
+function answer(t)
+if t == "Yes" then
+local lplr = game.Players.LocalPlayer
+local chr = lplr.Character
+local cframe = chr.HumanoidRootPart.CFrame
+function farm(o)
+function check(b)
+if b.Name == "Broken" then
+	return true
+else
+	return false
+end
+end
+local tp = true
+if lplr.Backpack:FindFirstChild("Axe") then
+	lplr.Backpack.Axe.Parent = chr
+end
+game.RunService.Heartbeat:connect(function()
+if tp then
+if chr:FindFirstChild("Axe") then
+chr.Axe.RemoteEvent:FireServer(o)
+chr.HumanoidRootPart.CFrame = o.CFrame
+end
+end
+end)
+repeat wait() until check(o)
+tp = false
+end
+local m
+for i, b in ipairs(workspace:GetChildren()) do
+	if b.Name:match("Map") then
+		m = b
+	end
+end
+if m then
+for i, ore in ipairs(m.Map.Ores:GetChildren()) do
+	farm(ore)
+end
+wait(0.1)
+chr.HumanoidRootPart.CFrame = cframe
+end
+end
+end
+local invoke = Instance.new("BindableFunction")
+invoke.OnInvoke = answer
+game.StarterGui:SetCore("SendNotification", {
+	Title = "Automine";
+	Text = "Mine all ores?";
+	Callback = invoke;
+	Button1 = "Yes";
+	Button2 = "No";
+})
+end
+elseif key == "k" then
+function answer(t)
+if t == "Yes" then
+if not workspace:FindFirstChild("KillFolder") then
+local kf = Instance.new("Folder", workspace)
+kf.Name = "KillFolder"
+end
+if not workspace.KillFolder:FindFirstChild("ManualWeld") then
+local motor = Instance.new("ManualWeld", workspace.KillFolder)
+end
+local motor = workspace.KillFolder.ManualWeld
+if not workspace.KillFolder:FindFirstChild("Part") then
+local part = Instance.new("Part", workspace.KillFolder)
+end
+local kpart = workspace.KillFolder.Part
+kpart.Size = Vector3.new(1, 1, 1)
+kpart.CanCollide = false
+motor.C0 = CFrame.new() + Vector3.new(0, 0, 4)
+local lplr = game.Players.LocalPlayer
+function kill(plr)
+motor.Part1 = kpart
+local chr = lplr.Character
+local hrp = chr.HumanoidRootPart
+local pchr = plr.Character
+local atk = true
+if not chr:FindFirstChild("Sword") then
+lplr.Backpack.Sword.Parent = chr
+end
+game.RunService.Heartbeat:connect(function()
+if pchr:FindFirstChild("HumanoidRootPart") and atk and pchr.HumanoidRootPart.CFrame.Y > 0 then
+motor.Part0 = pchr.HumanoidRootPart
+if chr:FindFirstChild("Sword") and motor.Part1 ~= nil then
+mouse1click()
+wait()
+mouse1release()
+hrp.CFrame = kpart.CFrame
+end
+elseif pchr:FindFirstChild("HumanoidRootPart") and pchr.HumanoidRootPart.CFrame.Y < 0 then
+pchr.Humanoid.Health = 0
+end
+end)
+pchr.Humanoid:GetPropertyChangedSignal("Health"):connect(function()
+if pchr.Humanoid.Health == 0 then
+atk = false
+motor.Part1 = nil
+motor.Part0 = nil
+end
+end)
+end
+function dead(plr)
+if plr.Character.Humanoid.Health == 0 or plr.Character.HumanoidRootPart.CFrame.Y < 0 then
+return true
+else
+return false
+end
+end
+for i, plr in ipairs(game.Players:GetPlayers()) do
+if plr.Name ~= lplr.Name and #plr.Backpack:GetChildren() ~= 0 then
+if plr.Character  and plr.Character:FindFirstChild("Humanoid") then
+kill(plr)
+repeat wait() until dead(plr)
+end
+end
+end
+local _ = true
+game.RunService.Heartbeat:connect(function()
+if _ then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.Lobby["Middle Room"].Floor.Base.Union.CFrame + Vector3.new(0, 20, 0)
+end
+end)
+wait(1)
+_ = false
+end
+end
+local invoke = Instance.new("BindableFunction")
+invoke.OnInvoke = answer
+game.StarterGui:SetCore("SendNotification", {
+	Title = "Autokill";
+	Text = "Kill everyone on map?";
+	Callback = invoke;
+	Button1 = "Yes";
+	Button2 = "No";
+})
+end
+end)
+--anticheat delete
+local extra = game.Players.LocalPlayer.PlayerGui.Extra
+workspace.Lobby.KillPlates:Destroy()
+workspace.Borders.InvisibleBorder:Destroy()
+extra:Destroy()
+game.Players.LocalPlayer.PlayerGui.ChildAdded:connect(function(b)
+if b.Name == "Extra" then
+	wait(0.5)
+    b:Destroy()
+end
+end)
+--fast mine
+game.RunService.RenderStepped:connect(function()
+if not game.UserInputService:IsKeyDown(Enum.KeyCode.Z) then return end
+if game.Players.LocalPlayer.Character:FindFirstChild("Axe") then
+game.Players.LocalPlayer.Character.Axe.RemoteEvent:FireServer(game.Players.LocalPlayer:GetMouse().Target)
+end
+end)
+--Mega vip thing
+local enter = workspace.Lobby["Mega VIP Room"].Teleport.Enter
+enter["Teleporter B"].Touched:connect(function(h)
+if game.Players:GetPlayerFromCharacter(h.Parent) and game.Players:GetPlayerFromCharacter(h.Parent).Name == game.Players.LocalPlayer.Name then
+	h.Parent:MoveTo(enter["Teleporter A"].Position)
+end
+end)
+print("List of keybinds:\nQ to toggle Antifallpart\nX to highlight all ores on the map\nHold Z and press X to use automine\nZ and hover over blocks to mine them really fast\nK to kill others on the map (If your exploit can use mouse1click())\nAdditionally, The game's anticheat gets deleted + there's a Mega VIP spoofer just to make it look like you have the Mega \nVIP gamepass lol")
